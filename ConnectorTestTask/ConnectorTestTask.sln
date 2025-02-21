@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectorTestTask.Core", "ConnectorTestTask.Core\ConnectorTestTask.Core.csproj", "{251C4D56-C26C-43AD-A119-85FE2D06C80C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectorTestTask.Presentation", "ConnectorTestTask.Presentation\ConnectorTestTask.Presentation.csproj", "{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{251C4D56-C26C-43AD-A119-85FE2D06C80C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{251C4D56-C26C-43AD-A119-85FE2D06C80C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{251C4D56-C26C-43AD-A119-85FE2D06C80C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{251C4D56-C26C-43AD-A119-85FE2D06C80C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
