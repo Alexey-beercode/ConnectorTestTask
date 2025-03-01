@@ -13,4 +13,28 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Views\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Shared\Error.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Shared\_Layout.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ConnectorTestTask.Core\ConnectorTestTask.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.2.0" />
+      <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Portfolio\Index.cshtml" />
+      <AdditionalFiles Include="Views\Portfolio\Result.cshtml" />
+    </ItemGroup>
+
 </Project>

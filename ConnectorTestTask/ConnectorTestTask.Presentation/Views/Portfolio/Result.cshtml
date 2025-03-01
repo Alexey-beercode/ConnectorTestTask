@@ -1,0 +1,23 @@
+﻿@model ConnectorTestTask.Presentation.Models.PortfolioViewModel
+
+@{
+    ViewData["Title"] = "Результаты расчета";
+}
+
+<h2>Конвертированный баланс</h2>
+
+<table>
+    <tr>
+        <th>Исходная валюта</th>
+        <th>Сумма в @Model.TargetCurrency</th>
+    </tr>
+    @foreach (var item in Model.ConversionResults)
+    {
+        <tr>
+            <td>@item.Key</td>
+            <td>@item.Value</td>
+        </tr>
+    }
+</table>
+
+<a href="@Url.Action("Index")">Назад</a>

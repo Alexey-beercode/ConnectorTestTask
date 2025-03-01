@@ -1,0 +1,182 @@
+﻿@model ConnectorTestTask.Presentation.Models.PortfolioViewModel
+
+@{
+    ViewData["Title"] = "Расчет стоимости портфеля";
+}
+
+<h2>Введите ваш портфель</h2>
+
+<div id="error-container" class="error-message" style="display: none;"></div>
+
+<form id="portfolio-form">
+    <div id="currency-container">
+        <div class="currency-row">
+            <select name="Portfolio.Keys" class="currency-select">
+                @foreach (var currency in Model.AvailableCurrencies)
+                {
+                    <option value="@currency">@currency</option>
+                }
+            </select>
+            <input type="number" name="Portfolio.Values" step="0.0001" class="currency-amount" placeholder="Сумма" />
+            <button type="button" onclick="removeCurrency(this)">Удалить</button>
+        </div>
+    </div>
+
+    <button type="button" onclick="addCurrency()">Добавить валюту</button>
+
+    <div>
+        <label>Целевая валюта:</label>
+        <select id="target-currency" name="TargetCurrency">
+            @foreach (var currency in Model.AvailableCurrencies)
+            {
+                <option value="@currency">@currency</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit">Рассчитать</button>
+</form>
+
+<h2>Результаты расчета</h2>
+<table id="result-table" style="display: none;">
+    <thead>
+    <tr>
+        <th>Исходная валюта</th>
+        <th>Сумма в <span id="target-label"></span></th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    document.getElementById("portfolio-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+        let formData = new FormData(this);
+
+        fetch("@Url.Action("Calculate", "Portfolio")", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                let errorContainer = document.getElementById("error-container");
+                if (!data.success) {
+                    errorContainer.innerText = data.message;
+                    errorContainer.style.display = "block";
+                    return;
+                }
+                errorContainer.style.display = "none";
+
+                let table = document.getElementById("result-table");
+                let tbody = table.querySelector("tbody");
+                tbody.innerHTML = "";
+                document.getElementById("target-label").innerText = data.targetCurrency;
+
+                Object.entries(data.data).forEach(([currency, value]) => {
+                    let row = `<tr><td>${currency}</td><td>${value.toFixed(4)}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
+
+                table.style.display = "block";
+            })
+            .catch(error => console.error("Ошибка:", error));
+    });
+
+    function addCurrency() {
+        let container = document.getElementById("currency-container");
+        let newRow = document.createElement("div");
+        newRow.className = "currency-row";
+        newRow.innerHTML = `
+            <select name="Portfolio.Keys" class="currency-select">
+                @foreach (var currency in Model.AvailableCurrencies)
+        {
+            <option value="@currency">@currency</option>
+        }
+            </select>
+            <input type="number" name="Portfolio.Values" step="0.0001" class="currency-amount" placeholder="Сумма" />
+            <button type="button" onclick="removeCurrency(this)">Удалить</button>
+        `;
+        container.appendChild(newRow);
+    }
+
+    function removeCurrency(button) {
+        button.parentElement.remove();
+    }
+</script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+    }
+
+    h2 {
+        color: #333;
+    }
+
+    form {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin-bottom: 20px;
+    }
+
+    .currency-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .currency-select, .currency-amount {
+        margin-right: 10px;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .error-message {
+        color: red;
+        margin-bottom: 10px;
+        font-weight: bold;
+        background: #ffebeb;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid red;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th, td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
