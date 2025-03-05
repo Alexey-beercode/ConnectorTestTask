@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using ConnectorTestTask.Presentation.Middleware;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -18,6 +19,7 @@ namespace ConnectorTestTask.Presentation.Extensions
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             
             app.MapControllerRoute(
                 name: "default",

@@ -10,7 +10,7 @@ namespace ConnectorTestTask.Core.Interfaces
         Task ConnectAsync();
         Task SubscribeTrades(string pair);
         Task SubscribeCandles(string pair, int periodInSec);
-        Task Unsubscribe(string pair);
+        Task Unsubscribe(string pair, string interval = "1m");
         Task DisconnectAsync();
     }
 }

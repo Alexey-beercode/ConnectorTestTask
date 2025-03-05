@@ -1,5 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using CancellationTokenSource = System.Threading.CancellationTokenSource;
 using Uri = System.Uri;
 using ConnectorTestTask.Core.Helpers;
@@ -38,13 +39,15 @@ namespace ConnectorTestTask.Core.Clients
         public async Task SubscribeCandles(string pair, int periodInSec)
         {
             string interval = TimeConverter.ConvertToTimeframe(periodInSec);
-            string message = $"{{\"method\": \"SUBSCRIBE\", \"params\": [\"{pair.ToLower()}@kline_{interval}\"], \"id\": 2}}";
+            string message =
+                $"{{\"method\": \"SUBSCRIBE\", \"params\": [\"{pair.ToLower()}@kline_{interval}\"], \"id\": 2}}";
             await SendMessageAsync(message);
         }
 
-        public async Task Unsubscribe(string pair)
+        public async Task Unsubscribe(string pair, string interval = "1m")
         {
-            string message = $"{{\"method\": \"UNSUBSCRIBE\", \"params\": [\"{pair.ToLower()}@trade\", \"{pair.ToLower()}@kline_1m\"], \"id\": 3}}";
+            string message =
+                $"{{\"method\": \"UNSUBSCRIBE\", \"params\": [\"{pair.ToLower()}@trade\", \"{pair.ToLower()}@kline_{interval}\"], \"id\": 3}}";
             await SendMessageAsync(message);
         }
 
@@ -55,6 +58,7 @@ namespace ConnectorTestTask.Core.Clients
             {
                 await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
             }
+
             _webSocket.Dispose();
         }
 
@@ -62,7 +66,8 @@ namespace ConnectorTestTask.Core.Clients
         {
             if (_webSocket.State == WebSocketState.Open)
             {
-                await _webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, CancellationToken.None);
+                await _webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true,
+                    CancellationToken.None);
             }
         }
 
@@ -80,22 +85,76 @@ namespace ConnectorTestTask.Core.Clients
 
         private void ProcessMessage(string message)
         {
-            if (message.Contains("\"e\":\"trade\""))
+            try
             {
-                var trade = BinanceParser.ParseTrades(message, "BTCUSDT").FirstOrDefault();
+                if (message.Contains("\"e\":\"trade\""))
+                {
+                    ProcessTradeMessage(message);
+                }
+                else if (message.Contains("\"e\":\"kline\""))
+                {
+                    ProcessCandleMessage(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при обработке сообщения: {ex.Message}");
+            }
+        }
+
+        private void ProcessTradeMessage(string message)
+        {
+            var pair = ExtractPairFromMessage(message);
+            if (string.IsNullOrEmpty(pair))
+            {
+                Console.WriteLine("Не удалось извлечь пару из сообщения о трейде.");
+                return;
+            }
+
+            var trades = BinanceParser.ParseTrades(message, pair);
+            foreach (var trade in trades)
+            {
                 if (trade != null)
                 {
                     NewTradeReceived?.Invoke(trade);
                 }
             }
-            else if (message.Contains("\"e\":\"kline\""))
+        }
+
+        private void ProcessCandleMessage(string message)
+        {
+            var pair = ExtractPairFromMessage(message);
+            if (string.IsNullOrEmpty(pair))
             {
-                var candle = BinanceParser.ParseCandles(message, "BTCUSDT").FirstOrDefault();
+                Console.WriteLine("Не удалось извлечь пару из сообщения о свече.");
+                return;
+            }
+
+            var candles = BinanceParser.ParseCandles(message, pair);
+            foreach (var candle in candles)
+            {
                 if (candle != null)
                 {
                     NewCandleReceived?.Invoke(candle);
                 }
             }
+        }
+
+        private string ExtractPairFromMessage(string message)
+        {
+            try
+            {
+                var json = JsonSerializer.Deserialize<JsonElement>(message);
+                if (json.TryGetProperty("s", out var symbolProperty))
+                {
+                    return symbolProperty.GetString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при извлечении пары: {ex.Message}");
+            }
+            return null;
         }
     }
 }

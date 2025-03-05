@@ -12,8 +12,9 @@ namespace ConnectorTestTask.Core.Clients
 
         public BinanceRestClient(HttpClient httpClient)
         {
+            var baseUri = new Uri("https://api.binance.com/api/v3/");
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _httpClient.BaseAddress = new Uri("https://api.binance.com/api/v3/");
+            _httpClient.BaseAddress = baseUri;
         }
 
         public async Task<IEnumerable<Trade>> GetTradesAsync(string pair, int maxCount)
@@ -36,7 +37,7 @@ namespace ConnectorTestTask.Core.Clients
             try
             {
                 string interval = TimeConverter.ConvertToTimeframe(periodInSec);
-                string endpoint = $"klines?symbol={pair.ToUpper()}&interval={interval}&limit={count}";
+                string endpoint = $"klines?symbol={pair.ToUpper()}&interval={interval}&startTime={from?.ToUnixTimeMilliseconds()}&endTime={to?.ToUnixTimeMilliseconds()}&limit={count}";
                 var response = await _httpClient.GetStringAsync(endpoint);
                 return BinanceParser.ParseCandles(response, pair);
             }

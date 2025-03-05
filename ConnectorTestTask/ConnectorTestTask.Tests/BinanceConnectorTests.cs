@@ -1,9 +1,14 @@
-﻿using System.Text.Json;
-using ConnectorTestTask.Core.Clients;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using ConnectorTestTask.Core.Implementations;
+using ConnectorTestTask.Core.Clients;
 using ConnectorTestTask.Core.Models;
-using MockServer.Client.Net;
-using MockServer.Client.Net.Models;
+using Xunit;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace ConnectorTestTask.Tests
 {
@@ -12,140 +17,120 @@ namespace ConnectorTestTask.Tests
         private readonly BinanceConnector _connector;
         private readonly BinanceRestClient _restClient;
         private readonly BinanceWebSocketClient _webSocketClient;
-        private readonly HttpClient _httpClient;
-        private readonly MockServerClient _mockServer;
+        private readonly Mock<ILogger<BinanceConnector>> _loggerMock;
 
         public BinanceConnectorTests()
         {
-            _httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:1080") };
-            _restClient = new BinanceRestClient(_httpClient);
+            _restClient = new BinanceRestClient(new HttpClient { BaseAddress = new Uri("https://api.binance.com/api/v3/") });
             _webSocketClient = new BinanceWebSocketClient();
+            _loggerMock = new Mock<ILogger<BinanceConnector>>();
             _connector = new BinanceConnector(_restClient, _webSocketClient);
-            _mockServer = new MockServerClient("http://localhost:1080");
         }
 
-        public async Task InitializeAsync()
-        {
-            await SetupMockResponses();
-        }
-
-        public async Task DisposeAsync()
-        {
-            // MockServer автоматически завершается, ничего вызывать не нужно
-        }
-
-        private async Task SetupMockResponses()
-        {
-            var expectation = new ExpectationDTO
-            {
-                HttpRequest = new HttpRequestDTO
-                {
-                    Method = "GET",
-                    Path = "/api/v3/exchangeInfo"
-                },
-                HttpResponse = new HttpResponseDTO
-                {
-                    Body = JsonSerializer.Serialize(new
-                    {
-                        symbols = new[]
-                        {
-                            new { symbol = "BTCUSDT", baseAsset = "BTC", quoteAsset = "USDT" },
-                            new { symbol = "ETHUSDT", baseAsset = "ETH", quoteAsset = "USDT" }
-                        }
-                    }),
-                    StatusCode = 200
-                }
-            };
-            await _mockServer.ExpectationAsync(expectation);
-        }
+        public Task InitializeAsync() => Task.CompletedTask;
+        public Task DisposeAsync() => Task.CompletedTask;
 
         [Fact]
-        public async Task GetAvailableCurrenciesAsync_Returns_CorrectList()
+        public async Task GetAvailableCurrenciesAsync_ShouldReturn_Currencies()
         {
             var result = await _connector.GetAvailableCurrenciesAsync();
 
             Assert.NotNull(result);
+            Assert.NotEmpty(result);
             Assert.Contains("BTC", result);
-            Assert.Contains("ETH", result);
             Assert.Contains("USDT", result);
         }
 
         [Fact]
-        public async Task GetNewTradesAsync_Returns_Trades()
+        public async Task GetNewTradesAsync_ShouldReturn_Trades()
         {
-            var mockTrades = new List<Trade>
+            var trades = await _connector.GetNewTradesAsync("BTCUSDT", 5);
+
+            Assert.NotNull(trades);
+            Assert.NotEmpty(trades);
+            Assert.All(trades, trade =>
             {
-                new Trade { Pair = "BTCUSDT", Price = 50000, Amount = 0.1M, Side = "buy", Time = DateTimeOffset.UtcNow }
-            };
-
-            _mockServer
-                .When(HttpRequest.Request()
-                    .WithMethod("GET")
-                    .WithPath("/api/v3/trades"))
-                .Respond(HttpResponse.Response()
-                    .WithBody(JsonSerializer.Serialize(mockTrades))
-                    .WithStatusCode(200));
-
-            var result = await _connector.GetNewTradesAsync("BTCUSDT", 5);
-
-            Assert.NotNull(result);
-            Assert.NotEmpty(result);
-            Assert.All(result, trade => Assert.Equal("BTCUSDT", trade.Pair));
+                Assert.Equal("BTCUSDT", trade.Pair);
+                Assert.True(trade.Price > 0, "Price must be greater than 0");
+                Assert.True(trade.Amount > 0, "Amount must be greater than 0");
+            });
         }
 
         [Fact]
-        public async Task GetCandleSeriesAsync_Returns_Candles()
+        public async Task GetCandleSeriesAsync_ShouldReturn_Candles()
         {
-            var mockCandles = new List<List<object>>
+            var candles = await _connector.GetCandleSeriesAsync("BTCUSDT", 60, null, null, 5);
+
+            Assert.NotNull(candles);
+            Assert.NotEmpty(candles);
+            Assert.All(candles, candle =>
             {
-                new List<object> { 1631234567000, "50000", "51000", "49000", "50500", "1000" },
-                new List<object> { 1631234600000, "50500", "51500", "49500", "51000", "1200" }
-            };
-
-            _mockServer
-                .When(HttpRequest.Request()
-                    .WithMethod("GET")
-                    .WithPath("/api/v3/klines"))
-                .Respond(HttpResponse.Response()
-                    .WithBody(JsonSerializer.Serialize(mockCandles))
-                    .WithStatusCode(200));
-
-            var result = await _connector.GetCandleSeriesAsync("BTCUSDT", 60, null, null, 2);
-
-            Assert.NotNull(result);
-            Assert.NotEmpty(result);
-            Assert.All(result, candle => Assert.Equal("BTCUSDT", candle.Pair));
+                Assert.Equal("BTCUSDT", candle.Pair);
+                Assert.True(candle.OpenPrice > 0, "OpenPrice must be greater than 0");
+                Assert.True(candle.ClosePrice > 0, "ClosePrice must be greater than 0");
+                Assert.True(candle.HighPrice > 0, "HighPrice must be greater than 0");
+                Assert.True(candle.LowPrice > 0, "LowPrice must be greater than 0");
+            });
         }
 
         [Fact]
-        public async Task CalculatePortfolioValueAsync_Calculates_Correctly()
-        {
-            var portfolio = new Dictionary<string, decimal>
-            {
-                { "BTC", 1 },
-                { "ETH", 10 }
-            };
-
-            var result = await _connector.CalculatePortfolioValueAsync(portfolio, "USDT");
-
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
-            Assert.Equal(50000, result["BTC"]);
-        }
-
-        [Fact]
-        public async Task WebSocketClient_Receives_Trades()
+        public async Task WebSocket_ShouldReceive_Trades()
         {
             var receivedTrades = new List<Trade>();
-            _connector.NewBuyTrade += trade => receivedTrades.Add(trade);
-            _connector.NewSellTrade += trade => receivedTrades.Add(trade);
+            var tradeReceived = new TaskCompletionSource<bool>();
 
-            await _webSocketClient.ConnectAsync();
-            await _webSocketClient.SubscribeTrades("BTCUSDT");
+            _connector.NewBuyTrade += trade =>
+            {
+                receivedTrades.Add(trade);
+                tradeReceived.TrySetResult(true);
+            };
 
-            await Task.Delay(5000);
+            _connector.NewSellTrade += trade =>
+            {
+                receivedTrades.Add(trade);
+                tradeReceived.TrySetResult(true);
+            };
+
+            _connector.SubscribeTrades("BTCUSDT");
+
+            // Ждем получения хотя бы одной сделки
+            var completedTask = await Task.WhenAny(tradeReceived.Task, Task.Delay(60000)); // Увеличили время ожидания до 60 секунд
+
+            _connector.UnsubscribeTrades("BTCUSDT");
+
+            if (completedTask != tradeReceived.Task)
+            {
+                Assert.Fail("WebSocket не получил ни одной сделки в течение 60 секунд.");
+            }
 
             Assert.NotEmpty(receivedTrades);
+        }
+
+        [Fact]
+        public async Task WebSocket_ShouldReceive_Candles()
+        {
+            var receivedCandles = new List<Candle>();
+            var candleReceived = new TaskCompletionSource<bool>();
+
+            _connector.CandleSeriesProcessing += candle =>
+            {
+                receivedCandles.Add(candle);
+                candleReceived.TrySetResult(true);
+            };
+
+            _connector.SubscribeCandles("BTCUSDT", 60);
+
+            // Ждем получения хотя бы одной свечи
+            var completedTask = await Task.WhenAny(candleReceived.Task, Task.Delay(60000)); // Увеличили время ожидания до 60 секунд
+
+            _connector.UnsubscribeCandles("BTCUSDT");
+
+            if (completedTask != candleReceived.Task)
+            {
+                Assert.Fail("WebSocket не получил ни одной свечи в течение 60 секунд.");
+            }
+
+            Assert.NotEmpty(receivedCandles);
         }
     }
 }

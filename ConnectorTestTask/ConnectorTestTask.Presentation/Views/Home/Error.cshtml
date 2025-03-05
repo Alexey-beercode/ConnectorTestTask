@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Ошибка";
+}
+
+<h1 class="text-danger">Ошибка</h1>
+<h2 class="text-danger">Произошла ошибка при обработке вашего запроса.</h2>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <h3>Сообщение об ошибке:</h3>
+    <p>@ViewBag.ErrorMessage</p>
+}
+
+@if (ViewBag.StackTrace != null)
+{
+    <h3>Детали ошибки:</h3>
+    <pre>@ViewBag.StackTrace</pre>
+}
+
+<a href="/" class="btn btn-primary">Вернуться на главную</a>
