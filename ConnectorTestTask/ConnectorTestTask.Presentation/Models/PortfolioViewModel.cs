@@ -1,17 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ConnectorTestTask.Presentation.Models
 {
     public class PortfolioViewModel
     {
         [Required]
-        public Dictionary<string, decimal> Portfolio { get; set; } = new();
+        public List<PortfolioItem> Portfolio { get; set; } = new();
 
         [Required]
         public string TargetCurrency { get; set; }
 
         public Dictionary<string, decimal>? ConversionResults { get; set; }
 
-        public HashSet<string> AvailableCurrencies { get; set; } = new();
+        [Required]
+        public List<string> AvailableCurrencies { get; set; } = new();
     }
+
+  
 }

@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectorTestTask.Core", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectorTestTask.Presentation", "ConnectorTestTask.Presentation\ConnectorTestTask.Presentation.csproj", "{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectorTestTask.Tests", "ConnectorTestTask.Tests\ConnectorTestTask.Tests.csproj", "{86BA9729-55CA-4EF0-8C2E-7723992E3078}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E8BD35F-B514-4218-9F31-6FF4A7FC34E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86BA9729-55CA-4EF0-8C2E-7723992E3078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86BA9729-55CA-4EF0-8C2E-7723992E3078}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86BA9729-55CA-4EF0-8C2E-7723992E3078}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86BA9729-55CA-4EF0-8C2E-7723992E3078}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

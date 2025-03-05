@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using ConnectorTestTask.Core.Helpers;
 using ConnectorTestTask.Core.Interfaces;
 using ConnectorTestTask.Core.Models;
@@ -45,19 +46,33 @@ namespace ConnectorTestTask.Core.Clients
                 return new List<Candle>();
             }
         }
-
         public async Task<decimal> GetTickerAsync(string pair)
         {
             try
             {
                 string endpoint = $"ticker/price?symbol={pair.ToUpper()}";
-                var response = await _httpClient.GetStringAsync(endpoint);
-                var json = JsonSerializer.Deserialize<Dictionary<string, string>>(response);
-                return json != null ? Convert.ToDecimal(json["price"]) : 0;
+                using var response = await _httpClient.GetAsync(endpoint);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var json = JsonSerializer.Deserialize<Dictionary<string, string>>(responseBody);
+
+                if (json != null && json.TryGetValue("price", out var priceStr))
+                {
+                    if (decimal.TryParse(priceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out var price))
+                    {
+                        return price;
+                    }
+                }
+
+                return 0;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Ошибка получения тикера: {ex.Message}");
                 return 0;
             }
         }
