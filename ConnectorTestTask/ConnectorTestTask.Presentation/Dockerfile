@@ -1,13 +1,13 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 7013
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ConnectorTestTask.Presentation/ConnectorTestTask.Presentation.csproj", "ConnectorTestTask.Presentation/"]
+COPY ["ConnectorTestTask.Core/ConnectorTestTask.Core.csproj", "ConnectorTestTask.Core/"]
 RUN dotnet restore "ConnectorTestTask.Presentation/ConnectorTestTask.Presentation.csproj"
 COPY . .
 WORKDIR "/src/ConnectorTestTask.Presentation"
