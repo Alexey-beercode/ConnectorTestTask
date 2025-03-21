@@ -53,8 +53,8 @@ public static class WebApplicationBuilderExtensions
     }
     private static void AddBinanceHttpResiliencePolicy(this WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpClient("BinanceClient")
-            .AddResilienceHandler("binance-api", builder =>
+        builder.Services.AddHttpClient("BybitClient")
+            .AddResilienceHandler("bybit-api", builder =>
             {
                 builder.AddRetry(new()
                 {
@@ -77,12 +77,12 @@ public static class WebApplicationBuilderExtensions
 
     private static void RegisterBinance(this WebApplicationBuilder builder)
     {
-        builder.Services.Configure<BinanceOptions>(
-            builder.Configuration.GetSection(BinanceOptions.SectionName));
+        builder.Services.Configure<BybitOptions>(
+            builder.Configuration.GetSection(BybitOptions.SectionName));
 
         builder.Services.AddHttpClient();
 
-        builder.Services.AddScoped<IMarketDataServiceFactory, BinanceDataServiceFactory>();
+        builder.Services.AddScoped<IMarketDataServiceFactory, BybitMarketDataServiceFactory>();
         
         builder.Services.AddScoped<IMarketDataService>(sp =>
         {

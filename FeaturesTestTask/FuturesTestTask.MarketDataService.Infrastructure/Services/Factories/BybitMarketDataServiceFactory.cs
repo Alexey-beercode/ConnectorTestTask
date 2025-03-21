@@ -7,12 +7,12 @@ using Microsoft.Extensions.Options;
 
 namespace FuturesTestTask.MarketDataService.Infrastructure.Services.Factories;
 
-public class BinanceDataServiceFactory : IMarketDataServiceFactory
+public class BybitMarketDataServiceFactory : IMarketDataServiceFactory
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IOptions<BinanceOptions> _options;
+    private readonly IOptions<BybitOptions> _options;
 
-    public BinanceDataServiceFactory(IHttpClientFactory httpClientFactory, IOptions<BinanceOptions> options)
+    public BybitMarketDataServiceFactory(IHttpClientFactory httpClientFactory, IOptions<BybitOptions> options)
     {
         _httpClientFactory = httpClientFactory;
         _options = options;
@@ -20,7 +20,7 @@ public class BinanceDataServiceFactory : IMarketDataServiceFactory
 
     public IMarketDataService CreateService()
     {
-        var client = _httpClientFactory.CreateClient("BinanceClient");
-        return new BinanceMarketDataService(client, _options);
+        var client = _httpClientFactory.CreateClient("BybitClient");
+        return new BybitMarketDataService(client, _options);
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace FuturesTestTask.MarketDataService.Infrastructure.Configuration;
 
-public class BinanceOptions
+public class BybitOptions
 {
-    public const string SectionName = "Binance";
+    public const string SectionName = "Bybit";
     public string FuturesApiBaseUrl { get; set; } = default!;
 }
