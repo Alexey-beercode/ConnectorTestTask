@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\FuturesTestTask.MarketDataService.Application\FuturesTestTask.MarketDataService.Application.csproj" />
       <ProjectReference Include="..\FuturesTestTask.MarketDataService.Domain\FuturesTestTask.MarketDataService.Domain.csproj" />
     </ItemGroup>
 
@@ -24,10 +25,6 @@
       </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Jobs\" />
     </ItemGroup>
 
 </Project>

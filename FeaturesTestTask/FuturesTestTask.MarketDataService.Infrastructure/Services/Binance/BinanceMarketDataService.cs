@@ -1,30 +1,27 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using FuturesTestTask.MarketDataService.Domain.Interfaces.Services;
+﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using FuturesTestTask.MarketDataService.Domain.Interfaces.Services;
+using FuturesTestTask.MarketDataService.Infrastructure.Configuration;
 
 namespace FuturesTestTask.MarketDataService.Infrastructure.Services.Binance;
 
 public class BinanceMarketDataService : IMarketDataService
 {
-    private const string BinanceFuturesBaseUrl = "https://fapi.binance.com/fapi/v1/klines";
-
     private readonly HttpClient _httpClient;
+    private readonly string _baseUrl;
 
-    public BinanceMarketDataService(HttpClient httpClient)
+    public BinanceMarketDataService(HttpClient httpClient, IOptions<BinanceOptions> options)
     {
         _httpClient = httpClient;
+        _baseUrl = options.Value.FuturesApiBaseUrl.TrimEnd('/');
     }
 
-    /// <inheritdoc />
     public async Task<decimal?> GetFuturesClosePriceAsync(string symbol, string interval, DateTime dateUtc)
     {
         var roundedDate = RoundToIntervalStart(dateUtc, interval);
         var startTime = new DateTimeOffset(roundedDate).ToUnixTimeMilliseconds();
 
-        var requestUrl = $"{BinanceFuturesBaseUrl}?symbol={symbol}&interval={interval}&startTime={startTime}&limit=1";
+        var requestUrl = $"{_baseUrl}/klines?symbol={symbol}&interval={interval}&startTime={startTime}&limit=1";
 
         var response = await _httpClient.GetStringAsync(requestUrl);
         var klineData = JsonConvert.DeserializeObject<List<List<object>>>(response);

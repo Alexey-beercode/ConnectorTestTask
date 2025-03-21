@@ -10,4 +10,14 @@ public class FuturesData : BaseEntity
     public decimal QuarterPrice { get; private set; }
     public decimal BiQuarterPrice { get; private set; }
     public decimal PriceDifference { get; private set; } 
+    
+    public FuturesData(decimal quarterPrice, decimal biQuarterPrice, DateTime timestamp)
+    {
+        Id = Guid.NewGuid();
+        Timestamp = timestamp;
+        QuarterPrice = quarterPrice;
+        BiQuarterPrice = biQuarterPrice;
+        PriceDifference = quarterPrice - biQuarterPrice;
+    }
+
 }
