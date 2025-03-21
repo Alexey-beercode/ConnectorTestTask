@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeaturesTestTask.MarketDataService.Presentation", "FeaturesTestTask.MarketDataService.Presentation\FeaturesTestTask.MarketDataService.Presentation.csproj", "{D2BC1C84-1BF1-48DC-8787-F699C78243CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuturesTestTask.MarketDataService.Presentation", "FuturesTestTask.MarketDataService.Presentation\FuturesTestTask.MarketDataService.Presentation.csproj", "{D2BC1C84-1BF1-48DC-8787-F699C78243CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FuturesTestTask.MarketDataService", "FuturesTestTask.MarketDataService", "{600F51F6-13E8-48A4-89C9-73CB24443055}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeaturesTestTask.MarketDataService.Domain", "FeaturesTestTask.MarketDataService.Domain\FeaturesTestTask.MarketDataService.Domain.csproj", "{16765055-D935-47D4-9077-F2155E7803AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuturesTestTask.MarketDataService.Domain", "FuturesTestTask.MarketDataService.Domain\FuturesTestTask.MarketDataService.Domain.csproj", "{16765055-D935-47D4-9077-F2155E7803AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeaturesTestTask.MarketDataService.Application", "FeaturesTestTask.MarketDataService.Application\FeaturesTestTask.MarketDataService.Application.csproj", "{00744B21-AE2E-4D74-B7C2-90F270A73F47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuturesTestTask.MarketDataService.Application", "FuturesTestTask.MarketDataService.Application\FuturesTestTask.MarketDataService.Application.csproj", "{00744B21-AE2E-4D74-B7C2-90F270A73F47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeaturesTestTask.MarketDataService.Infrastructure", "FeaturesTestTask.MarketDataService.Infrastructure\FeaturesTestTask.MarketDataService.Infrastructure.csproj", "{C0E0A46D-EE35-4DDF-BEDB-483C8FB6D2CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuturesTestTask.MarketDataService.Infrastructure", "FuturesTestTask.MarketDataService.Infrastructure\FuturesTestTask.MarketDataService.Infrastructure.csproj", "{C0E0A46D-EE35-4DDF-BEDB-483C8FB6D2CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{55209979-2D34-4C83-97C5-DCA40C2A8EFD}"
 EndProject
