@@ -1,0 +1,39 @@
+﻿version: '3.8'
+
+services:
+  market-data-service:
+    build:
+      context: ./src
+      dockerfile: FuturesTestTask.MarketDataService.Presentation/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Host=market-data-db;Port=5432;Database=market_data_db;Username=postgres;Password=futuresmark
+      - Binance__FuturesApiBaseUrl=https://fapi.binance.com/api
+    depends_on:
+      - market-data-db
+    networks:
+      - market-data-network
+
+  market-data-db:
+    image: postgres:15
+    container_name: market-data-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: futuresmark
+      POSTGRES_DB: market_data_db
+    volumes:
+      - market-data-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - market-data-network
+
+volumes:
+  market-data-postgres-data:
+
+networks:
+  market-data-network:
+    driver: bridge

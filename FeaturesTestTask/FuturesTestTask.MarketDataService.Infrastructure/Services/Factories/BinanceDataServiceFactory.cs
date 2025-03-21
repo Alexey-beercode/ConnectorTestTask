@@ -1,25 +1,26 @@
 ﻿using System.Net.Http;
+using FeaturesTestTask.MarketDataService.Domain.Interfaces.Factories;
 using FuturesTestTask.MarketDataService.Domain.Interfaces.Services;
-using FuturesTestTask.MarketDataService.Infrastructure.Common;
 using FuturesTestTask.MarketDataService.Infrastructure.Configuration;
 using FuturesTestTask.MarketDataService.Infrastructure.Services.Binance;
 using Microsoft.Extensions.Options;
 
 namespace FuturesTestTask.MarketDataService.Infrastructure.Services.Factories;
 
-public class BinanceDataServiceFactory : MarketDataServiceFactory
+public class BinanceDataServiceFactory : IMarketDataServiceFactory
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IOptions<BinanceOptions> _options;
 
-    public BinanceDataServiceFactory(HttpClient httpClient, IOptions<BinanceOptions> options)
+    public BinanceDataServiceFactory(IHttpClientFactory httpClientFactory, IOptions<BinanceOptions> options)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _options = options;
     }
 
-    public override IMarketDataService CreateService()
+    public IMarketDataService CreateService()
     {
-        return new BinanceMarketDataService(_httpClient, _options);
+        var client = _httpClientFactory.CreateClient("BinanceClient");
+        return new BinanceMarketDataService(client, _options);
     }
 }
